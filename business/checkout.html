@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../js/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#635bff">
+    <meta name="description" content="Confirm your LEXON AI Business plan.">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <title>Confirm Your Plan — LEXON AI</title>
+    <style>
+        .checkout-shell {
+            width: min(560px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 48px 0 100px;
+        }
+
+        .checkout-step { display: none; }
+        .checkout-step.active { display: block; }
+
+        .checkout-card {
+            background: var(--lexon-surface);
+            border: 1px solid #e8e8ef;
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 10px 35px rgba(20, 20, 40, .05);
+        }
+
+        .checkout-steps-indicator {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .checkout-steps-indicator span {
+            flex: 1;
+            height: 4px;
+            border-radius: 999px;
+            background: #ecebff;
+        }
+
+        .checkout-steps-indicator span.done {
+            background: var(--lexon-accent);
+        }
+
+        .checkout-card h1 {
+            margin: 0 0 6px;
+            font-size: 22px;
+        }
+
+        .checkout-card > p.subtitle {
+            margin: 0 0 22px;
+            color: #667085;
+            font-size: 14px;
+        }
+
+        .receipt-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f5;
+            font-size: 14px;
+        }
+
+        .receipt-row:last-child { border-bottom: none; }
+
+        .receipt-row span:first-child { color: #667085; }
+        .receipt-row span:last-child { font-weight: 700; color: var(--lexon-text); }
+
+        .receipt-total {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid #e8e8ef;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .payment-mock-note {
+            margin: 16px 0 0;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #fff8e6;
+            border: 1px solid #f5e0a3;
+            font-size: 12.5px;
+            color: #8a6d1f;
+            line-height: 1.5;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #e7f9ef;
+            color: #1e9e5a;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 18px;
+            font-size: 30px;
+        }
+
+        .checkout-card.center { text-align: center; }
+
+        .form-message { font-size: 13px; margin: 6px 0 0; min-height: 18px; }
+        .form-message.error { color: #e0344c; }
+        .form-message.success { color: #1e9e5a; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="../index.html" class="brand" aria-label="Home">
+                <span class="brand-mark" aria-hidden="true"><img src="../assets/logos/lexon-icon.svg" alt=""></span>
+                <span class="brand-name">LEXON AI</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="checkout-shell">
+
+        <div class="checkout-steps-indicator" id="stepIndicator">
+            <span data-step="1"></span>
+            <span data-step="2"></span>
+            <span data-step="3"></span>
+        </div>
+
+        <!-- Step 1: Business Info Form -->
+        <section class="checkout-step active" id="stepForm">
+            <div class="checkout-card">
+                <h1>Business details</h1>
+                <p class="subtitle" id="formSubtitle">Tell us where to send your listing confirmation.</p>
+
+                <form id="businessForm">
+                    <div class="form-group">
+                        <label for="bizName">Full name</label>
+                        <input type="text" id="bizName" required placeholder="Your name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bizEmail">Email</label>
+                        <input type="email" id="bizEmail" required placeholder="you@business.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bizPhone">Phone number</label>
+                        <input type="tel" id="bizPhone" required placeholder="+91 98765 43210">
+                        <small style="color:#98a2b3;font-size:12px;">Phone verification is optional right now — you can skip it.</small>
+                    </div>
+
+                    <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
+
+                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;">Confirm</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Step 2: Receipt / Confirmation -->
+        <section class="checkout-step" id="stepReceipt">
+            <div class="checkout-card">
+                <h1>Review your order</h1>
+                <p class="subtitle">Double-check the details before continuing to payment.</p>
+
+                <div class="receipt-row"><span>Plan</span><span id="receiptPlan">—</span></div>
+                <div class="receipt-row"><span>Includes</span><span id="receiptFeatures">—</span></div>
+                <div class="receipt-row"><span>Name</span><span id="receiptName">—</span></div>
+                <div class="receipt-row"><span>Email</span><span id="receiptEmail">—</span></div>
+                <div class="receipt-row"><span>Phone</span><span id="receiptPhone">—</span></div>
+
+                <div class="receipt-total"><span>Total</span><span id="receiptAmount">₹0</span></div>
+
+                <button type="button" class="btn btn-primary" style="width:100%;margin-top:20px;" id="continueToPaymentBtn">Continue</button>
+                <button type="button" class="btn btn-secondary" style="width:100%;margin-top:10px;" id="backToFormBtn">Back</button>
+            </div>
+        </section>
+
+        <!-- Step 3: Payment (test/mock) -->
+        <section class="checkout-step" id="stepPayment">
+            <div class="checkout-card">
+                <h1>Payment</h1>
+                <p class="subtitle">Testing payment — no real charge will be made.</p>
+
+                <div class="receipt-row"><span>Amount to pay</span><span id="paymentAmount">₹0</span></div>
+
+                <div id="paymentMessage" class="form-message" role="alert" aria-live="polite"></div>
+
+                <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;" id="payNowBtn">Pay now</button>
+
+                <p class="payment-mock-note">
+                    This is a test payment flow for now — a real payment gateway
+                    can be connected later. No money is charged.
+                </p>
+            </div>
+        </section>
+
+        <!-- Step 4: Success -->
+        <section class="checkout-step" id="stepSuccess">
+            <div class="checkout-card center">
+                <div class="success-icon" aria-hidden="true">✓</div>
+                <h1>Payment successful</h1>
+                <p class="subtitle" id="successSubtitle">Your plan is now active.</p>
+                <a href="dashboard.html" class="btn btn-primary" style="width:100%;">Go to dashboard</a>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        const params = new URLSearchParams(window.location.search);
+        const plan = params.get("plan") || "starter";
+        const price = Number(params.get("price") || 0);
+        const features = params.get("features") || "";
+
+        const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+
+        let businessInfo = null;
+        let currentUser = null;
+
+        function goToStep(stepId, stepNumber) {
+          document.querySelectorAll(".checkout-step").forEach(el => el.classList.remove("active"));
+          document.getElementById(stepId).classList.add("active");
+
+          document.querySelectorAll("#stepIndicator span").forEach(el => {
+            el.classList.toggle("done", Number(el.dataset.step) <= stepNumber);
+          });
+
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function formatINR(amount) {
+          return "₹" + Number(amount).toLocaleString("en-IN");
+        }
+
+        async function init() {
+          const client = window.LexonSupabase?.client();
+
+          if (client) {
+            currentUser = await window.LexonSupabase.getCurrentUser();
+
+            if (!currentUser) {
+              const nextPath = "business/checkout.html" + window.location.search;
+              window.location.href = "../pages/login.html?next=" + encodeURIComponent(nextPath);
+              return;
+            }
+
+            // Pre-fill from existing profile if available.
+            const { data: profile } = await client
+              .from("profiles")
+              .select("name, email")
+              .eq("id", currentUser.id)
+              .maybeSingle();
+
+            if (profile) {
+              if (profile.name) document.getElementById("bizName").value = profile.name;
+              if (profile.email) document.getElementById("bizEmail").value = profile.email;
+            }
+          }
+
+          document.getElementById("formSubtitle").textContent =
+            `You're subscribing to the ${planLabel} plan (${formatINR(price)}/month).`;
+        }
+
+        document.getElementById("businessForm").addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const name = document.getElementById("bizName").value.trim();
+          const email = document.getElementById("bizEmail").value.trim();
+          const phone = document.getElementById("bizPhone").value.trim();
+          const messageEl = document.getElementById("formMessage");
+
+          messageEl.textContent = "";
+          messageEl.className = "form-message";
+
+          if (!name || !email || !phone) {
+            messageEl.textContent = "Please fill in all fields.";
+            messageEl.classList.add("error");
+            return;
+          }
+
+          const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailPattern.test(email)) {
+            messageEl.textContent = "Please enter a valid email address.";
+            messageEl.classList.add("error");
+            return;
+          }
+
+          if (phone.replace(/\D/g, "").length < 7) {
+            messageEl.textContent = "Please enter a valid phone number.";
+            messageEl.classList.add("error");
+            return;
+          }
+
+          businessInfo = { name, email, phone };
+
+          document.getElementById("receiptPlan").textContent = planLabel;
+          document.getElementById("receiptFeatures").textContent = features || "—";
+          document.getElementById("receiptName").textContent = name;
+          document.getElementById("receiptEmail").textContent = email;
+          document.getElementById("receiptPhone").textContent = phone;
+          document.getElementById("receiptAmount").textContent = formatINR(price) + "/month";
+          document.getElementById("paymentAmount").textContent = formatINR(price);
+
+          goToStep("stepReceipt", 2);
+        });
+
+        document.getElementById("backToFormBtn").addEventListener("click", function () {
+          goToStep("stepForm", 1);
+        });
+
+        document.getElementById("continueToPaymentBtn").addEventListener("click", function () {
+          goToStep("stepPayment", 3);
+        });
+
+        document.getElementById("payNowBtn").addEventListener("click", async function () {
+          const payBtn = this;
+          const messageEl = document.getElementById("paymentMessage");
+
+          messageEl.textContent = "";
+          messageEl.className = "form-message";
+          payBtn.disabled = true;
+          payBtn.textContent = "Processing...";
+
+          const client = window.LexonSupabase?.client();
+
+          if (!client || !currentUser) {
+            messageEl.textContent = "You need to be signed in to complete this.";
+            messageEl.classList.add("error");
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay now";
+            return;
+          }
+
+          try {
+            // Simulated processing delay — replace with a real payment
+            // gateway call here when one is connected.
+            await new Promise(resolve => setTimeout(resolve, 900));
+
+            // Save the business's contact details.
+            const { error: profileError } = await client
+              .from("business_profiles")
+              .upsert({
+                business_id: currentUser.id,
+                name: businessInfo.name,
+                email: businessInfo.email,
+                phone: businessInfo.phone
+              }, { onConflict: "business_id" });
+
+            if (profileError) throw profileError;
+
+            // Activate the subscription only after "payment" succeeds.
+            const { error: subError } = await client
+              .from("business_subscriptions")
+              .insert({
+                business_id: currentUser.id,
+                plan,
+                price_inr: price,
+                status: "active",
+                payment_status: "paid"
+              });
+
+            if (subError) throw subError;
+
+            document.getElementById("successSubtitle").textContent =
+              `Your ${planLabel} plan is now active. You can start listing your tools and courses.`;
+
+            goToStep("stepSuccess", 3);
+          } catch (error) {
+            messageEl.textContent = error.message || "Payment could not be completed. Please try again.";
+            messageEl.classList.add("error");
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay now";
+          }
+        });
+
+        init();
+      })();
+    </script>
+</body>
+</html>

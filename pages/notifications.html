@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <title>Notifications — LEXON AI</title>
+
+  <script src="../js/theme.js"></script>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" href="../assets/logos/lexon-icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+
+  <style>
+    .notif-shell {
+      width: min(640px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 110px;
+    }
+
+    .notif-page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .notif-page-header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .notif-mark-all {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--lexon-accent);
+    }
+
+    .notif-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 20px;
+    }
+
+    .notif-tab {
+      flex-shrink: 0;
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1.5px solid var(--lexon-border-strong);
+      background: var(--lexon-surface);
+      color: var(--lexon-text-secondary);
+      font-size: 12.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .notif-tab.active {
+      border-color: var(--lexon-accent);
+      background: var(--lexon-accent-soft);
+      color: var(--lexon-accent);
+    }
+
+    .notif-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .notif-item {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--lexon-border);
+      border-radius: var(--lexon-radius-lg);
+      background: var(--lexon-surface);
+      text-align: left;
+      width: 100%;
+    }
+
+    .notif-item.unread {
+      background: var(--lexon-accent-soft);
+      border-color: rgba(99, 91, 255, 0.25);
+    }
+
+    .notif-item-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--lexon-surface-soft);
+      font-size: 18px;
+    }
+
+    .notif-item-title {
+      margin: 0 0 3px;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .notif-item-desc {
+      margin: 0 0 6px;
+      font-size: 12.5px;
+      color: var(--lexon-text-secondary);
+      line-height: 1.5;
+    }
+
+    .notif-item-time {
+      font-size: 11px;
+      color: var(--lexon-text-muted);
+    }
+
+    .notif-empty {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--lexon-text-secondary);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../index.html" aria-label="LEXON AI Home">
+        <span class="brand-mark" aria-hidden="true"><img src="../assets/logos/lexon-icon.svg" alt=""></span>
+        <span class="brand-name">LEXON AI</span>
+      </a>
+      <div class="header-actions">
+        <a class="icon-button avatar-link" href="profile.html" aria-label="Profile">
+          <span class="avatar" id="profileAvatar">?</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="notif-shell">
+    <div class="notif-page-header">
+      <h1>Notifications</h1>
+      <button type="button" class="notif-mark-all" id="markAllRead">Mark all as read</button>
+    </div>
+
+    <div class="notif-tabs" id="notifTabs"></div>
+
+    <div class="notif-list" id="notifList">
+      <div class="notif-empty">Loading…</div>
+    </div>
+  </main>
+
+  <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+    <a href="../index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path><path d="M9 22V12h6v10"></path></svg>
+      <span>Home</span>
+    </a>
+    <a href="videos.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
+      <span>Videos</span>
+    </a>
+    <a href="courses.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+      <span>Courses</span>
+    </a>
+    <a href="settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/avatar.js"></script>
+  <script>
+    const CATEGORY_ICONS = { courses: "🎓", tools: "🛠️", prompts: "✨", videos: "🎥", guides: "📘", updates: "🚀" };
+    const CATEGORY_LABELS = { all: "All", courses: "Courses", tools: "Tools", prompts: "Prompts", videos: "Videos", guides: "Guides", updates: "Updates" };
+
+    let notifications = [];
+    let readIds = new Set();
+    let activeCategory = "all";
+    let client = null;
+    let user = null;
+
+    function escapeHTML(str) {
+      const div = document.createElement("div");
+      div.textContent = str || "";
+      return div.innerHTML;
+    }
+
+    function timeAgo(dateStr) {
+      const diffMs = Date.now() - new Date(dateStr).getTime();
+      const mins = Math.floor(diffMs / 60000);
+      if (mins < 1) return "Just now";
+      if (mins < 60) return mins + "m ago";
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return hours + "h ago";
+      const days = Math.floor(hours / 24);
+      if (days < 7) return days + "d ago";
+      return new Date(dateStr).toLocaleDateString();
+    }
+
+    function renderTabs() {
+      document.getElementById("notifTabs").innerHTML = Object.keys(CATEGORY_LABELS).map(key => `
+        <button type="button" class="notif-tab${key === activeCategory ? " active" : ""}" data-category="${key}">${CATEGORY_LABELS[key]}</button>
+      `).join("");
+
+      document.querySelectorAll(".notif-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          activeCategory = tab.dataset.category;
+          renderTabs();
+          renderList();
+        });
+      });
+    }
+
+    function renderList() {
+      const listEl = document.getElementById("notifList");
+      const filtered = activeCategory === "all" ? notifications : notifications.filter(n => n.category === activeCategory);
+
+      if (!filtered.length) {
+        listEl.innerHTML = '<div class="notif-empty">No notifications here yet.</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(n => {
+        const isUnread = !readIds.has(n.id);
+        return `
+          <button type="button" class="notif-item${isUnread ? " unread" : ""}" data-id="${n.id}" data-link="${escapeHTML(n.link_url || "")}">
+            <span class="notif-item-icon">${CATEGORY_ICONS[n.category] || "🔔"}</span>
+            <span>
+              <p class="notif-item-title">${escapeHTML(n.title)}</p>
+              ${n.description ? `<p class="notif-item-desc">${escapeHTML(n.description)}</p>` : ""}
+              <span class="notif-item-time">${timeAgo(n.created_at)}</span>
+            </span>
+          </button>
+        `;
+      }).join("");
+
+      listEl.querySelectorAll(".notif-item").forEach(item => {
+        item.addEventListener("click", async () => {
+          const id = item.dataset.id;
+          const link = item.dataset.link;
+          if (client && user && !readIds.has(id)) {
+            readIds.add(id);
+            try { await client.from("notification_reads").insert({ notification_id: id, user_id: user.id }); } catch (e) {}
+          }
+          if (link) window.location.href = link;
+        });
+      });
+    }
+
+    async function loadNotifications() {
+      client = window.LexonSupabase?.client();
+      if (!client) {
+        document.getElementById("notifList").innerHTML = '<div class="notif-empty">Connect Supabase to load notifications.</div>';
+        return;
+      }
+
+      user = await window.LexonSupabase.getCurrentUser();
+
+      const { data } = await client.from("notifications").select("*").order("created_at", { ascending: false }).limit(100);
+      notifications = data || [];
+
+      if (user) {
+        const { data: reads } = await client.from("notification_reads").select("notification_id").eq("user_id", user.id);
+        readIds = new Set((reads || []).map(r => r.notification_id));
+      }
+
+      renderTabs();
+      renderList();
+
+      const profileAvatar = document.getElementById("profileAvatar");
+      if (user && profileAvatar) {
+        const { data: profile } = await client.from("profiles").select("name").eq("id", user.id).maybeSingle();
+        if (profile?.name) profileAvatar.textContent = profile.name.trim().charAt(0).toUpperCase();
+      }
+    }
+
+    document.getElementById("markAllRead").addEventListener("click", async () => {
+      const unread = notifications.filter(n => !readIds.has(n.id));
+      unread.forEach(n => readIds.add(n.id));
+      renderList();
+      if (client && user) {
+        try {
+          await client.from("notification_reads").upsert(unread.map(n => ({ notification_id: n.id, user_id: user.id })));
+        } catch (e) {}
+      }
+    });
+
+    loadNotifications();
+  </script>
+</body>
+</html>

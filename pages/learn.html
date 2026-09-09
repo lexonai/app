@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="../js/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#635bff">
+    <meta name="description" content="Learn AI from zero to advanced with a growing question-based library.">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <title>Continue Learning — LEXON AI</title>
+    <style>
+        .page-shell {
+            width: min(900px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 32px 0 110px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1.1;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #667085;
+            max-width: 620px;
+        }
+
+        .learn-progress-bar-wrap {
+            margin: 20px 0 28px;
+        }
+
+        .learn-progress-track {
+            height: 8px;
+            border-radius: 999px;
+            background: #f2f4f7;
+            overflow: hidden;
+        }
+
+        .learn-progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: var(--lexon-accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .learn-progress-label {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #667085;
+        }
+
+        .learn-toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .learn-search {
+            flex: 1 1 260px;
+            min-height: 48px;
+            border: 1px solid #e4e7ec;
+            border-radius: 14px;
+            padding: 0 16px;
+            background: var(--lexon-surface);
+            color: var(--lexon-text);
+            font: inherit;
+            outline: none;
+        }
+
+        .learn-level-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            margin-bottom: 24px;
+        }
+
+        .learn-level-tab {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1.5px solid #e4e7ec;
+            background: var(--lexon-surface);
+            color: #667085;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .learn-level-tab.active {
+            border-color: var(--lexon-accent);
+            background: rgba(99, 91, 255, 0.1);
+            color: var(--lexon-accent);
+        }
+
+        .learn-question-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .learn-question-card {
+            border: 1px solid #e4e7ec;
+            border-radius: 16px;
+            background: var(--lexon-surface);
+            overflow: hidden;
+        }
+
+        .learn-question-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 18px;
+            background: none;
+            border: none;
+            text-align: left;
+            font: inherit;
+            font-weight: 600;
+            color: var(--lexon-text);
+            cursor: pointer;
+        }
+
+        .learn-question-toggle .lexon-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1.5px solid #d0d5dd;
+            flex-shrink: 0;
+            font-size: 12px;
+            color: transparent;
+        }
+
+        .learn-question-card.answered .lexon-check {
+            background: var(--lexon-accent);
+            border-color: var(--lexon-accent);
+            color: #fff;
+        }
+
+        .learn-question-toggle .chevron {
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+            color: #98a2b3;
+        }
+
+        .learn-question-card.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .learn-question-answer {
+            display: none;
+            padding: 0 18px 18px 54px;
+            color: #475467;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .learn-question-card.open .learn-question-answer {
+            display: block;
+        }
+
+        .learn-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 24px;
+        }
+
+        .learn-pagination button {
+            min-height: 42px;
+            padding: 0 18px;
+            border-radius: 12px;
+            border: 1px solid #e4e7ec;
+            background: var(--lexon-surface);
+            color: var(--lexon-text);
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .learn-pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .learn-pagination span {
+            font-size: 13px;
+            color: #667085;
+        }
+
+        .empty-state {
+            display: none;
+            text-align: center;
+            padding: 48px 24px;
+            border: 1px dashed #d0d5dd;
+            border-radius: 20px;
+            background: #fcfcfd;
+        }
+
+        .empty-state.visible { display: block; }
+
+        @media (max-width: 640px) {
+            .page-shell {
+                width: min(100% - 24px, 900px);
+                padding-top: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="../index.html" class="brand" aria-label="Home">
+                <span class="brand-mark" aria-hidden="true"><img src="../assets/logos/lexon-icon.svg" alt=""></span>
+                <span class="brand-name">LEXON AI</span>
+            </a>
+
+            <nav class="desktop-nav" aria-label="Primary navigation">
+                <a href="../index.html">Home</a>
+                <a href="videos.html">Videos</a>
+                <a href="courses.html">Courses</a>
+                <a href="tools.html">Tools</a>
+                <a href="guides.html">Guides</a>
+            </nav>
+
+            <div class="header-actions">
+                <button class="icon-button" type="button" id="notificationButton" aria-label="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <a href="profile.html" class="avatar-link" aria-label="Profile">
+                    <span class="avatar" id="profileAvatar">?</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="page-header">
+            <h1>Continue Learning</h1>
+            <p>Learn AI from zero to advanced — one question at a time. Tap any question to reveal the answer.</p>
+        </section>
+
+        <div class="learn-progress-bar-wrap">
+            <div class="learn-progress-track" aria-hidden="true">
+                <div class="learn-progress-fill" id="learnProgressFill"></div>
+            </div>
+            <p class="learn-progress-label" id="learnProgressLabel">0 of 0 questions answered</p>
+        </div>
+
+        <section class="learn-toolbar" aria-label="Search questions">
+            <input
+                class="learn-search"
+                id="learnSearch"
+                type="search"
+                placeholder="Search a question, e.g. 'what is an AI agent'..."
+                autocomplete="off"
+                aria-label="Search questions"
+            >
+        </section>
+
+        <div class="learn-level-tabs" id="learnLevelTabs" role="tablist">
+            <button type="button" class="learn-level-tab active" data-level="all">All levels</button>
+            <button type="button" class="learn-level-tab" data-level="beginner">Beginner</button>
+            <button type="button" class="learn-level-tab" data-level="intermediate">Intermediate</button>
+            <button type="button" class="learn-level-tab" data-level="advanced">Advanced</button>
+        </div>
+
+        <section class="learn-question-list" id="learnQuestionList" aria-live="polite"></section>
+
+        <div class="learn-pagination" id="learnPagination"></div>
+
+        <section class="empty-state" id="learnEmptyState">
+            <h2>No questions found</h2>
+            <p>Try a different search term or level.</p>
+        </section>
+    </main>
+
+    <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+        <a href="../index.html">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+            <span>Home</span>
+        </a>
+        <a href="videos.html">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                <path d="m10 9 5 3-5 3V9Z" fill="currentColor"/>
+            </svg>
+            <span>Videos</span>
+        </a>
+        <a class="active" href="courses.html">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M4 5.5v16M8 7h8M8 11h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <span>Courses</span>
+        </a>
+        <a href="settings.html">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="1.8"/>
+            </svg>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/learn-questions.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        var PAGE_SIZE = 10;
+        var PROGRESS_KEY = "lexon_learn_answered";
+
+        var state = {
+          all: [],
+          filtered: [],
+          page: 1,
+          level: "all",
+          query: ""
+        };
+
+        var listEl = document.getElementById("learnQuestionList");
+        var paginationEl = document.getElementById("learnPagination");
+        var emptyEl = document.getElementById("learnEmptyState");
+        var searchEl = document.getElementById("learnSearch");
+        var tabsEl = document.getElementById("learnLevelTabs");
+        var progressFill = document.getElementById("learnProgressFill");
+        var progressLabel = document.getElementById("learnProgressLabel");
+
+        function getAnsweredSet() {
+          try {
+            var raw = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "[]");
+            return new Set(Array.isArray(raw) ? raw : []);
+          } catch (e) {
+            return new Set();
+          }
+        }
+
+        function markAnswered(id) {
+          var set = getAnsweredSet();
+          set.add(id);
+          try {
+            localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(set)));
+          } catch (e) {}
+          updateProgress();
+        }
+
+        function updateProgress() {
+          var answered = getAnsweredSet();
+          var total = state.all.length;
+          var answeredInLibrary = state.all.filter(function (q) {
+            return answered.has(q.id);
+          }).length;
+
+          var percent = total ? Math.round((answeredInLibrary / total) * 100) : 0;
+
+          progressFill.style.width = percent + "%";
+          progressLabel.textContent = answeredInLibrary + " of " + total + " questions answered";
+        }
+
+        function escapeHTML(value) {
+          var div = document.createElement("div");
+          div.textContent = value == null ? "" : String(value);
+          return div.innerHTML;
+        }
+
+        function applyFilters() {
+          var query = state.query.trim().toLowerCase();
+          var level = state.level;
+
+          state.filtered = state.all.filter(function (q) {
+            var matchesLevel = level === "all" || q.level === level;
+            var matchesQuery = !query || q.question.toLowerCase().indexOf(query) !== -1;
+            return matchesLevel && matchesQuery;
+          });
+
+          state.page = 1;
+          render();
+        }
+
+        function render() {
+          var answered = getAnsweredSet();
+          var start = (state.page - 1) * PAGE_SIZE;
+          var pageItems = state.filtered.slice(start, start + PAGE_SIZE);
+
+          emptyEl.classList.toggle("visible", state.filtered.length === 0);
+
+          listEl.innerHTML = pageItems
+            .map(function (q) {
+              var isAnswered = answered.has(q.id);
+              return (
+                '<article class="learn-question-card' + (isAnswered ? " answered" : "") + '" data-id="' + escapeHTML(q.id) + '">' +
+                  '<button type="button" class="learn-question-toggle">' +
+                    '<span class="lexon-check" aria-hidden="true">✓</span>' +
+                    '<span style="flex:1">' + escapeHTML(q.question) + '</span>' +
+                    '<svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+                  '</button>' +
+                  '<div class="learn-question-answer">' + escapeHTML(q.answer) + '</div>' +
+                '</article>'
+              );
+            })
+            .join("");
+
+          listEl.querySelectorAll(".learn-question-card").forEach(function (card) {
+            card.querySelector(".learn-question-toggle").addEventListener("click", function () {
+              card.classList.toggle("open");
+              if (card.classList.contains("open")) {
+                card.classList.add("answered");
+                markAnswered(card.dataset.id);
+              }
+            });
+          });
+
+          renderPagination();
+        }
+
+        function renderPagination() {
+          var totalPages = Math.max(1, Math.ceil(state.filtered.length / PAGE_SIZE));
+
+          if (totalPages <= 1) {
+            paginationEl.innerHTML = "";
+            return;
+          }
+
+          paginationEl.innerHTML =
+            '<button type="button" id="learnPrev"' + (state.page === 1 ? " disabled" : "") + '>Previous</button>' +
+            '<span>Page ' + state.page + ' of ' + totalPages + '</span>' +
+            '<button type="button" id="learnNext"' + (state.page === totalPages ? " disabled" : "") + '>Next</button>';
+
+          var prevBtn = document.getElementById("learnPrev");
+          var nextBtn = document.getElementById("learnNext");
+
+          if (prevBtn) {
+            prevBtn.addEventListener("click", function () {
+              if (state.page > 1) {
+                state.page -= 1;
+                render();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            });
+          }
+
+          if (nextBtn) {
+            nextBtn.addEventListener("click", function () {
+              if (state.page < totalPages) {
+                state.page += 1;
+                render();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            });
+          }
+        }
+
+        searchEl.addEventListener("input", function (event) {
+          state.query = event.target.value;
+          applyFilters();
+        });
+
+        tabsEl.addEventListener("click", function (event) {
+          var button = event.target.closest("[data-level]");
+          if (!button) return;
+
+          tabsEl.querySelectorAll("[data-level]").forEach(function (b) {
+            b.classList.remove("active");
+          });
+          button.classList.add("active");
+
+          state.level = button.dataset.level;
+          applyFilters();
+        });
+
+        async function loadQuestions() {
+          // Starter library ships with the app (see js/learn-questions.js).
+          // If a Supabase "questions" table exists it is merged in on top,
+          // fetched in pages so the browser never has to hold the full
+          // 1,000–2,000 question library in memory at once — only the
+          // current page plus whatever the starter set already has.
+          state.all = window.LexonLearnQuestions.slice();
+
+          try {
+            var client = window.LexonSupabase && window.LexonSupabase.client();
+            if (client) {
+              var result = await client
+                .from("questions")
+                .select("id, question, answer, level")
+                .eq("status", "published")
+                .order("created_at", { ascending: true })
+                .range(0, 199); // first 200; deeper pages fetched as the user paginates
+
+              if (!result.error && Array.isArray(result.data) && result.data.length) {
+                var existingIds = new Set(state.all.map(function (q) { return q.id; }));
+                result.data.forEach(function (q) {
+                  if (!existingIds.has(q.id)) {
+                    state.all.push(q);
+                  }
+                });
+              }
+            }
+          } catch (error) {
+            // Supabase not configured yet, or no "questions" table —
+            // the shipped starter library is still fully usable.
+          }
+
+          applyFilters();
+          updateProgress();
+        }
+
+        (async function loadAvatar() {
+          try {
+            var client = window.LexonSupabase && window.LexonSupabase.client();
+            if (!client) return;
+            var userResult = await client.auth.getUser();
+            var user = userResult.data && userResult.data.user;
+            if (!user) return;
+            var profileResult = await client.from("profiles").select("name, avatar_url").eq("id", user.id).maybeSingle();
+            var profile = profileResult.data;
+            var el = document.getElementById("profileAvatar");
+            if (!el) return;
+            if (profile && profile.avatar_url) {
+              el.innerHTML = '<img src="' + escapeHTML(profile.avatar_url) + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+            } else if (profile && profile.name) {
+              el.textContent = profile.name.trim().charAt(0).toUpperCase();
+            }
+          } catch (error) {}
+        })();
+
+        loadQuestions();
+      })();
+    </script>
+    <script src="../js/notifications.js"></script>
+    <script src="../js/avatar.js"></script>
+</body>
+</html>
