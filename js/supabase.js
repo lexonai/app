@@ -1,4 +1,4 @@
-const SUPABASE_URL = "https://mldhvtivrpdimtzdgiin.supabase.co";
+const SUPABASE_URL = "https://mldhvtivrpdimtzdgiin.supabase.co/rest/v1/";
 const SUPABASE_ANON_KEY = "sb_publishable_dzSNDnPU8FZa2Zy7nxj_pQ_J8lV4dQ2";
 
 let supabaseClient = null;
